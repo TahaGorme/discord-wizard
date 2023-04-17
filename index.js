@@ -38,7 +38,7 @@ puppeteer
     console.log(mailCount)  
     mail = mails[mailCount]
     accountSplit = mail.split(':')
-    email = accountSplit[0]
+    email = mail
     password = generatePassword();
     console.log(username, email, password)    
 
