@@ -430,11 +430,13 @@ async function verifyEmail(data, index, email, page, headers) {
         }
       });
   } else {
-    if (index == 3) {
+    if (index == 2) {
       index = 0;
       verifyEmail(data, index, email, page, headers);
     } else {
+      await wait(randomInt(500,1500));
       index++;
+      
       verifyEmail(data, index, email, page, headers);
     }
   }
