@@ -373,16 +373,37 @@ async function verifyEmail(data, index, email, page, headers) {
           });
           try {
             await page.waitForSelector("[src*=sitekey]");
-            await page.addScriptTag({
-              content: `hcaptcha.execute()`,
-            });
+            if (config.devMode) console.log("Solving captcha");
+            await page.addScriptTag({ content: `hcaptcha.execute()` });
+            await page.solveRecaptchas();
+            if (config.devMode) console.log("Captcha solved");
 
-            while (true) {
-              try {
+            //detecting captcha loop
+            const captcha_2 = await page
+              .waitForSelector("[src*=sitekey]", { timeout: 5000 })
+              .catch(() => {
+                captcha_2 = false;
+              });
+
+            if (captcha_2) {
+              if (config.devMode) console.log("Captcha loop detected");
+              if (config.devMode) console.log(`Solving 2nd captcha...`);
+              await page.addScriptTag({ content: `hcaptcha.execute()` });
+              await page.solveRecaptchas();
+              if (config.devMode) console.log("2nd Captcha solved");
+
+              const captcha_3 = await page
+                .waitForSelector("[src*=sitekey]", { timeout: 5000 })
+                .catch(() => {
+                  captcha_3 = false;
+                });
+
+              if (captcha_3) {
+                if (config.devMode) console.log("Captcha loop detected");
+                if (config.devMode) console.log(`Solving 3nd captcha...`);
+                await page.addScriptTag({ content: `hcaptcha.execute()` });
                 await page.solveRecaptchas();
-                return true;
-              } catch (err) {
-                await wait(3000);
+                if (config.devMode) console.log("3nd Captcha solved");
               }
             }
           } catch (e) {}
@@ -446,12 +467,12 @@ async function verifyEmail(data, index, email, page, headers) {
         }
       });
   } else {
-    if (index == 2) {
+    if (index == 4) {
       index = 0;
       verifyEmail(data, index, email, page, headers);
     } else {
       index++;
-      await wait(randomInt(500,1500));
+      await wait(randomInt(500, 1500));
       verifyEmail(data, index, email, page, headers);
     }
   }
