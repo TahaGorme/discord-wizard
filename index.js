@@ -38,7 +38,7 @@ function wait(timeInMs) {
 new Promise(async (resolve, reject) => {
   puppeteer
     .launch({
-      headless: false,
+      headless: true,
       defaultViewport: null,
       // args: ["--proxy-server=socks5://54.254.52.187:8118"],
     })
@@ -76,7 +76,6 @@ new Promise(async (resolve, reject) => {
       emails.pop();
       if (config.devMode) console.log(`Fetched ${emails.length} emails.`);
 
-      // console.log(emails);
       browser.close();
       resolve();
     });
@@ -86,11 +85,14 @@ new Promise(async (resolve, reject) => {
       headless: false,
       defaultViewport: null,
       ignoreHTTPSErrors: true,
-      // args: ["--proxy-server=socks4://167.99.182.125:7101"],
+      // args: ["--proxy-server=socks4://117.251.103.186:8080"],
     })
     .then(async (browser) => {
       const page = await browser.newPage();
-
+      // await page.authenticate({
+      //   username: "TahaGorme-rotate",
+      //   password: "tahagorme8242",
+      // });
       // await wait(randomInt(300, 400));
       await page.setUserAgent(
         useragents[Math.floor(Math.random() * useragents.length)].trim()
@@ -252,21 +254,35 @@ new Promise(async (resolve, reject) => {
         await page.waitForSelector("[src*=sitekey]");
         if (config.devMode) console.log("Solving captcha");
         await page.addScriptTag({ content: `hcaptcha.execute()` });
-        var i = 0;
-        while (true) {
-          try {
+        await page.solveRecaptchas();
+        if (config.devMode) console.log("Captcha solved");
+
+        //detecting captcha loop
+        const captcha_2 = await page
+          .waitForSelector("[src*=sitekey]", { timeout: 5000 })
+          .catch(() => {
+            captcha_2 = false;
+          });
+
+        if (captcha_2) {
+          if (config.devMode) console.log("Captcha loop detected");
+          if (config.devMode) console.log(`Solving 2nd captcha...`);
+          await page.addScriptTag({ content: `hcaptcha.execute()` });
+          await page.solveRecaptchas();
+          if (config.devMode) console.log("2nd Captcha solved");
+
+          const captcha_3 = await page
+            .waitForSelector("[src*=sitekey]", { timeout: 5000 })
+            .catch(() => {
+              captcha_3 = false;
+            });
+
+          if (captcha_3) {
+            if (config.devMode) console.log("Captcha loop detected");
+            if (config.devMode) console.log(`Solving 3nd captcha...`);
+            await page.addScriptTag({ content: `hcaptcha.execute()` });
             await page.solveRecaptchas();
-            if (config.devMode) console.log("Captcha solved");
-            return true;
-          } catch (err) {
-            if (i > 3)
-              console.log(
-                "An error occured while solving captcha. Solved it 3 times already."
-              );
-            i++;
-            if (config.devMode)
-              console.log("Unable to solve captcha. Retrying...");
-            await wait(3000);
+            if (config.devMode) console.log("3nd Captcha solved");
           }
         }
       } catch (e) {}
@@ -434,9 +450,8 @@ async function verifyEmail(data, index, email, page, headers) {
       index = 0;
       verifyEmail(data, index, email, page, headers);
     } else {
-      await wait(randomInt(500,1500));
       index++;
-      
+      await wait(randomInt(500,1500));
       verifyEmail(data, index, email, page, headers);
     }
   }
