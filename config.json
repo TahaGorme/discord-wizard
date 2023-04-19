@@ -1,3 +1,4 @@
 {
-  "captcha_api_key": ""
+  "captcha_api_key": "your captcha key",
+  "devMode": true
 }
