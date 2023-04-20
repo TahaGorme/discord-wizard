@@ -191,7 +191,7 @@ new Promise(async (resolve, reject) => {
       await wait(randomInt(300, 400));
 
       await page.waitForSelector("#uid_5:not([disabled])");
-      await page.type("#uid_5", email);
+      await page.type("#uid_5", email, { delay: 100 });
       await wait(randomInt(300, 400));
 
       await page.waitForSelector("#uid_6");
@@ -199,7 +199,7 @@ new Promise(async (resolve, reject) => {
       await wait(randomInt(300, 500));
 
       await page.waitForSelector("#uid_6:not([disabled])");
-      await page.type("#uid_6", username);
+      await page.type("#uid_6", username, { delay: 100 });
       await wait(randomInt(300, 450));
 
       await page.waitForSelector("#uid_7");
@@ -207,7 +207,7 @@ new Promise(async (resolve, reject) => {
       await wait(randomInt(250, 300));
 
       await page.waitForSelector("#uid_7:not([disabled])");
-      await page.type("#uid_7", password);
+      await page.type("#uid_7", password, { delay: 100 });
       // await wait(randomI);
 
       await page.waitForSelector(
@@ -223,21 +223,21 @@ new Promise(async (resolve, reject) => {
       await wait(randomInt(200, 300));
 
       await page.waitForSelector("#react-select-2-input:not([disabled])");
-      await page.type("#react-select-2-input", month);
+      await page.type("#react-select-2-input", month, { delay: 100 });
       await wait(randomInt(300, 400));
 
       await page.waitForSelector("#react-select-2-input");
       await page.keyboard.press("Enter");
 
       await page.waitForSelector("#react-select-3-input:not([disabled])");
-      await page.type("#react-select-3-input", date);
+      await page.type("#react-select-3-input", date, { delay: 100 });
 
       await page.waitForSelector("#react-select-3-input");
       await page.keyboard.press("Enter");
       await wait(randomInt(300, 500));
 
       await page.waitForSelector("#react-select-4-input:not([disabled])");
-      await page.type("#react-select-4-input", year);
+      await page.type("#react-select-4-input", year, { delay: 100 });
       await wait(randomInt(200, 450));
 
       await page.waitForSelector("#react-select-4-input");
@@ -292,22 +292,22 @@ new Promise(async (resolve, reject) => {
       await fetchHeaders.setRequestInterception(true);
       await fetchHeaders.goto(`https://www.emailnator.com/inbox#${email}`);
 
-      await fetchHeaders.waitForSelector(
-        `#root > div > section > div > div > div.mb-3.col-lg-6.col-sm-12 > div > div.card-body > div:nth-child(3) > div > table > tbody > tr:nth-child(${index}) > td > a > table > tbody > tr > td:nth-child(2)`
-      );
+      // await fetchHeaders.waitForSelector(
+      //   `#root > div > section > div > div > div.mb-3.col-lg-6.col-sm-12 > div > div.card-body > div:nth-child(3) > div > table > tbody > tr:nth-child(${index}) > td > a > table > tbody > tr > td:nth-child(2)`
+      // );
 
-      const element = await fetchHeaders.$(
-        `#root > div > section > div > div > div.mb-3.col-lg-6.col-sm-12 > div > div.card-body > div:nth-child(3) > div > table > tbody > tr:nth-child(${index}) > td > a > table > tbody > tr > td:nth-child(2)`
-      );
-      const subject = await fetchHeaders.evaluate(
-        (element) => element.textContent,
-        element
-      );
-      // console.log(subject);
-      if (config.devMode) console.log("Subject: " + subject);
-      const element1 = await fetchHeaders.$(
-        `#root > div > section > div > div > div.mb-3.col-lg-6.col-sm-12 > div > div.card-body > div:nth-child(3) > div > table > tbody > tr:nth-child(${index}) > td > a`
-      );
+      // const element = await fetchHeaders.$(
+      //   `#root > div > section > div > div > div.mb-3.col-lg-6.col-sm-12 > div > div.card-body > div:nth-child(3) > div > table > tbody > tr:nth-child(${index}) > td > a > table > tbody > tr > td:nth-child(2)`
+      // );
+      // const subject = await fetchHeaders.evaluate(
+      //   (element) => element.textContent,
+      //   element
+      // );
+      // // console.log(subject);
+      // if (config.devMode) console.log("Subject: " + subject);
+      // const element1 = await fetchHeaders.$(
+      //   `#root > div > section > div > div > div.mb-3.col-lg-6.col-sm-12 > div > div.card-body > div:nth-child(3) > div > table > tbody > tr:nth-child(${index}) > td > a`
+      // );
       await fetchHeaders.evaluate((ele) => ele.click(), element1);
       fetchHeaders.on("request", (request) => {
         if (request.url() === "https://www.emailnator.com/message-list") {
@@ -351,10 +351,10 @@ async function verifyEmail(data, index, email, page, headers) {
     /^((https?:)(\/\/\/?)([\w]*(?::[\w]*)?@)?([\d\w\.-]+)(?::(\d+))?)?([\/\\\w\.()-]*)?(?:([?][^#]*)?(#.*)?)*/gim;
 
   if (
-    data.messageData[index].subject.includes(
+    data?.messageData[index]?.subject?.includes(
       "Verify Email Address for Discord"
     ) &&
-    data.messageData[index].from.includes("noreply@discord.com")
+    data?.messageData[index]?.from?.includes("noreply@discord.com")
   ) {
     fetch("https://www.emailnator.com/message-list", {
       headers: headers,
@@ -467,7 +467,7 @@ async function verifyEmail(data, index, email, page, headers) {
         }
       });
   } else {
-    if (index == 4) {
+    if (index == 3) {
       index = 0;
       verifyEmail(data, index, email, page, headers);
     } else {
