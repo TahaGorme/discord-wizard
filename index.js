@@ -11,7 +11,6 @@ let emails;
 let username, email, password, mail;
 
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
-puppeteer.use(StealthPlugin());
 const RecaptchaPlugin = require("puppeteer-extra-plugin-recaptcha");
 puppeteer.use(
   RecaptchaPlugin({
@@ -29,6 +28,7 @@ puppeteer.use(
     interceptResolutionPriority: DEFAULT_INTERCEPT_RESOLUTION_PRIORITY,
   })
 );
+puppeteer.use(StealthPlugin());
 
 function wait(timeInMs) {
   return new Promise((resolve) => {
@@ -38,7 +38,7 @@ function wait(timeInMs) {
 new Promise(async (resolve, reject) => {
   puppeteer
     .launch({
-      headless: true,
+      headless: "new",
       defaultViewport: null,
       // args: ["--proxy-server=socks5://54.254.52.187:8118"],
     })
@@ -85,21 +85,22 @@ new Promise(async (resolve, reject) => {
       headless: false,
       defaultViewport: null,
       ignoreHTTPSErrors: true,
-      // args: ["--proxy-server=socks4://117.251.103.186:8080"],
+      args: [
+        "--disable-web-security",
+        "--ignore-certificate-errors",
+        // "--proxy-server=https://83.149.72.110:10140",
+      ],
     })
     .then(async (browser) => {
       const page = await browser.newPage();
-      // await page.authenticate({
-      //   username: "TahaGorme-rotate",
-      //   password: "tahagorme8242",
-      // });
+
       // await wait(randomInt(300, 400));
+
       await page.setUserAgent(
         useragents[Math.floor(Math.random() * useragents.length)].trim()
       );
-
       await page.goto("https://www.discord.com/register", {
-        waitUntil: "networkidle0",
+        waitUntil: "networkidle2",
         timeout: 70000,
       });
       // Resize window to 1536 x 718
@@ -109,9 +110,7 @@ new Promise(async (resolve, reject) => {
       email = emails[Math.floor(Math.random() * emails.length)];
       password = generatePassword();
       if (config.devMode)
-        console.log(
-          `Generated Username: ${username} Email: ${email} Password: ${password}`
-        );
+      console.log(`Generated Username: ${username} Email: ${email} Password: ${password}`);
 
       var month = [
         "January",
@@ -191,7 +190,7 @@ new Promise(async (resolve, reject) => {
       await wait(randomInt(300, 400));
 
       await page.waitForSelector("#uid_5:not([disabled])");
-      await page.type("#uid_5", email, { delay: 100 });
+      await page.type("#uid_5", email, { delay: randomInt(60, 120) });
       await wait(randomInt(300, 400));
 
       await page.waitForSelector("#uid_6");
@@ -199,7 +198,7 @@ new Promise(async (resolve, reject) => {
       await wait(randomInt(300, 500));
 
       await page.waitForSelector("#uid_6:not([disabled])");
-      await page.type("#uid_6", username, { delay: 100 });
+      await page.type("#uid_6", username, { delay: randomInt(60, 120) });
       await wait(randomInt(300, 450));
 
       await page.waitForSelector("#uid_7");
@@ -207,7 +206,7 @@ new Promise(async (resolve, reject) => {
       await wait(randomInt(250, 300));
 
       await page.waitForSelector("#uid_7:not([disabled])");
-      await page.type("#uid_7", password, { delay: 100 });
+      await page.type("#uid_7", password, { delay: randomInt(60, 120) });
       // await wait(randomI);
 
       await page.waitForSelector(
@@ -223,21 +222,27 @@ new Promise(async (resolve, reject) => {
       await wait(randomInt(200, 300));
 
       await page.waitForSelector("#react-select-2-input:not([disabled])");
-      await page.type("#react-select-2-input", month, { delay: 100 });
+      await page.type("#react-select-2-input", month, {
+        delay: randomInt(60, 120),
+      });
       await wait(randomInt(300, 400));
 
       await page.waitForSelector("#react-select-2-input");
       await page.keyboard.press("Enter");
 
       await page.waitForSelector("#react-select-3-input:not([disabled])");
-      await page.type("#react-select-3-input", date, { delay: 100 });
+      await page.type("#react-select-3-input", date, {
+        delay: randomInt(60, 120),
+      });
 
       await page.waitForSelector("#react-select-3-input");
       await page.keyboard.press("Enter");
       await wait(randomInt(300, 500));
 
       await page.waitForSelector("#react-select-4-input:not([disabled])");
-      await page.type("#react-select-4-input", year, { delay: 100 });
+      await page.type("#react-select-4-input", year, {
+        delay: randomInt(60, 120),
+      });
       await wait(randomInt(200, 450));
 
       await page.waitForSelector("#react-select-4-input");
@@ -321,6 +326,7 @@ new Promise(async (resolve, reject) => {
             .then((response) => response.json())
             .then((data) => {
               if (data.messageData.length > 1) {
+                // fetchHeaders.close();
                 var index = 1;
                 if (config.devMode)
                   console.log("Trying to find the right email from discord...");
@@ -372,38 +378,46 @@ async function verifyEmail(data, index, email, page, headers) {
             timeout: 60000,
           });
           try {
-            await page.waitForSelector("[src*=sitekey]");
-            if (config.devMode) console.log("Solving captcha");
-            await page.addScriptTag({ content: `hcaptcha.execute()` });
-            await page.solveRecaptchas();
-            if (config.devMode) console.log("Captcha solved");
-
-            //detecting captcha loop
-            const captcha_2 = await page
-              .waitForSelector("[src*=sitekey]", { timeout: 5000 })
+            var firstCaptcha = await page
+              .waitForSelector("[src*=sitekey]", {
+                timeout: 6000,
+              })
               .catch(() => {
-                captcha_2 = false;
+                firstCaptcha = false;
               });
-
-            if (captcha_2) {
-              if (config.devMode) console.log("Captcha loop detected");
-              if (config.devMode) console.log(`Solving 2nd captcha...`);
+            if (firstCaptcha) {
+              if (config.devMode) console.log("Solving captcha");
               await page.addScriptTag({ content: `hcaptcha.execute()` });
               await page.solveRecaptchas();
-              if (config.devMode) console.log("2nd Captcha solved");
+              if (config.devMode) console.log("Captcha solved");
 
-              const captcha_3 = await page
+              //detecting captcha loop
+              const captcha_2 = await page
                 .waitForSelector("[src*=sitekey]", { timeout: 5000 })
                 .catch(() => {
-                  captcha_3 = false;
+                  captcha_2 = false;
                 });
 
-              if (captcha_3) {
+              if (captcha_2) {
                 if (config.devMode) console.log("Captcha loop detected");
-                if (config.devMode) console.log(`Solving 3nd captcha...`);
+                if (config.devMode) console.log(`Solving 2nd captcha...`);
                 await page.addScriptTag({ content: `hcaptcha.execute()` });
                 await page.solveRecaptchas();
-                if (config.devMode) console.log("3nd Captcha solved");
+                if (config.devMode) console.log("2nd Captcha solved");
+
+                const captcha_3 = await page
+                  .waitForSelector("[src*=sitekey]", { timeout: 5000 })
+                  .catch(() => {
+                    captcha_3 = false;
+                  });
+
+                if (captcha_3) {
+                  if (config.devMode) console.log("Captcha loop detected");
+                  if (config.devMode) console.log(`Solving 3nd captcha...`);
+                  await page.addScriptTag({ content: `hcaptcha.execute()` });
+                  await page.solveRecaptchas();
+                  if (config.devMode) console.log("3nd Captcha solved");
+                }
               }
             }
           } catch (e) {}
