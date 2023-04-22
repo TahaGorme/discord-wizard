@@ -41,10 +41,11 @@ new Promise(async (resolve, reject) => {
     .launch({
       headless: "new",
       defaultViewport: null,
-      // args: ["--proxy-server=socks5://54.254.52.187:8118"],
+      // args: ["--proxy-server=http://p.webshare.io:80"],
     })
     .then(async (browser) => {
       const page = await browser.newPage();
+
       PuppeteerBlocker.fromPrebuiltAdsAndTracking(fetch).then((blocker) => {
         blocker.enableBlockingInPage(page);
       });
@@ -91,24 +92,26 @@ new Promise(async (resolve, reject) => {
     .launch({
       headless: false,
       ignoreHTTPSErrors: true,
+      defaultViewport: { width: 1536, height: 864 },
       args: [
         "--disable-web-security",
         "--ignore-certificate-errors",
         `--window-size=1536,864`,
+
         // "--disable-features=IsolateOrigins,site-per-process",
         "--enable-features=NetworkService",
-        // "--proxy-server=socks5://mrs.socks.ipvanish.com:1080",
+        // "--proxy-server=http://p.webshare.io:80",
       ],
     })
     .then(async (browser) => {
       const page = await browser.newPage();
-
+      
       // await wait(randomInt(300, 400));
 
       await page.setUserAgent(
         useragents[Math.floor(Math.random() * useragents.length)].trim()
       );
-      await page.goto("https://www.discord.com/register", {
+      await page.goto("https://www.discord.com/", {
         waitUntil: "networkidle0",
         timeout: 70000,
       });
@@ -197,76 +200,37 @@ new Promise(async (resolve, reject) => {
         "2004",
         "2005",
       ][Math.floor(Math.random() * 26)];
-      // Click on <input> #uid_5
-      await page.waitForSelector("#uid_5");
-      await page.click("#uid_5");
-      await wait(randomInt(300, 400));
-
-      await page.waitForSelector("#uid_5:not([disabled])");
-      await page.type("#uid_5", email, { delay: randomInt(60, 120) });
-      await wait(randomInt(300, 400));
-
-      await page.waitForSelector("#uid_6");
-      await page.click("#uid_6");
-      await wait(randomInt(300, 500));
-
-      await page.waitForSelector("#uid_6:not([disabled])");
-      await page.type("#uid_6", username, { delay: randomInt(60, 120) });
-      await wait(randomInt(300, 450));
-
-      await page.waitForSelector("#uid_7");
-      await page.click("#uid_7");
-      await wait(randomInt(250, 300));
-
-      await page.waitForSelector("#uid_7:not([disabled])");
-      await page.type("#uid_7", password, { delay: randomInt(60, 120) });
-      // await wait(randomI);
 
       await page.waitForSelector(
-        "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div.app-3xd6d0 > div > div > div > form > div.centeringWrapper-dGnJPQ > div > fieldset > div.inputs-3ELGTz > div.month-1Z2bRu > div > div > div > div > div.css-1hwfws3 > div.css-mb2az-placeholder > span"
+        "#app-mount > div > div > div.grid-3d2PVT.heroBackground-itJzsn > div.row-31oovZ.heroContainer-3YphMz > div > div.ctaContainer-5100Xg > button"
       );
-      await wait(randomInt(400, 500));
-      await page.click(
-        "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div.app-3xd6d0 > div > div > div > form > div.centeringWrapper-dGnJPQ > div > fieldset > div.inputs-3ELGTz > div.month-1Z2bRu > div > div > div > div > div.css-1hwfws3 > div.css-mb2az-placeholder > span"
-      );
-
-      await page.waitForSelector(".css-kfxh0s-control span");
-      await page.click(".css-kfxh0s-control span");
-      await wait(randomInt(200, 300));
-
-      await page.waitForSelector("#react-select-2-input:not([disabled])");
-      await page.type("#react-select-2-input", month, {
-        delay: randomInt(60, 120),
-      });
       await wait(randomInt(300, 400));
+      await page.click(
+        "#app-mount > div > div > div.grid-3d2PVT.heroBackground-itJzsn > div.row-31oovZ.heroContainer-3YphMz > div > div.ctaContainer-5100Xg > button"
+      );
 
-      await page.waitForSelector("#react-select-2-input");
-      await page.keyboard.press("Enter");
+      await page.focus(
+        "#app-mount > div > div > div.grid-3d2PVT.heroBackground-itJzsn > div.row-31oovZ.heroContainer-3YphMz > div > div.formContainer-1Mw7aR > form > input"
+      );
+      await page.keyboard.type(username, { delay: randomInt(60, 120) });
 
-      await page.waitForSelector("#react-select-3-input:not([disabled])");
-      await page.type("#react-select-3-input", date, {
-        delay: randomInt(60, 120),
+      await page.click("[class *= 'checkbox']").catch((err) => {
+        if (config.devMode) console.log("No TOS checkbox found");
       });
 
-      await page.waitForSelector("#react-select-3-input");
+      await wait(randomInt(800, 1200));
+      //press enter
+      // await page.waitForSelector(
+      //   "#app-mount > div > div > div.grid-3d2PVT.heroBackground-itJzsn > div.row-31oovZ.heroContainer-3YphMz > div > div.formContainer-1Mw7aR > form > input"
+      // );
+      await page
+        .focus(
+          "#app-mount > div > div > div.grid-3d2PVT.heroBackground-itJzsn > div.row-31oovZ.heroContainer-3YphMz > div > div.formContainer-1Mw7aR > form > input"
+        )
+        .catch((err) => {});
+      await wait(randomInt(200, 400));
+
       await page.keyboard.press("Enter");
-      await wait(randomInt(300, 500));
-
-      await page.waitForSelector("#react-select-4-input:not([disabled])");
-      await page.type("#react-select-4-input", year, {
-        delay: randomInt(60, 120),
-      });
-      await wait(randomInt(200, 450));
-
-      await page.waitForSelector("#react-select-4-input");
-      await page.keyboard.press("Enter");
-
-      await page.waitForSelector(".inputDefault-2DXavk");
-      await page.click(".inputDefault-2DXavk");
-      await wait(randomInt(150, 200));
-
-      await page.waitForSelector(".button-1cRKG6");
-      await page.click(".button-1cRKG6");
 
       try {
         await page.waitForSelector("[src*=sitekey]");
@@ -276,6 +240,7 @@ new Promise(async (resolve, reject) => {
         if (config.devMode) console.log("Captcha solved");
 
         //detecting captcha loop
+        await wait(randomInt(2000, 3000));
         const captcha_2 = await page
           .waitForSelector("[src*=sitekey]", { timeout: 5000 })
           .catch(() => {
@@ -288,6 +253,7 @@ new Promise(async (resolve, reject) => {
           await page.addScriptTag({ content: `hcaptcha.execute()` });
           await page.solveRecaptchas();
           if (config.devMode) console.log("2nd Captcha solved");
+          await wait(randomInt(2000, 3000));
 
           const captcha_3 = await page
             .waitForSelector("[src*=sitekey]", { timeout: 5000 })
@@ -305,12 +271,181 @@ new Promise(async (resolve, reject) => {
         }
       } catch (e) {}
 
-      await wait(randomInt(3000, 5000));
+      const token = await page.evaluate(() => {
+        return window.webpackChunkdiscord_app.push([
+          [Math.random()],
+          {},
+          (req) => {
+            for (const m of Object.keys(req.c)
+              .map((x) => req.c[x].exports)
+              .filter((x) => x)) {
+              if (m.default && m.default.getToken !== undefined) {
+                return m.default.getToken();
+              }
+              if (m.getToken !== undefined) {
+                return m.getToken();
+              }
+            }
+          },
+        ]);
+      });
+
+      console.log("Generated Token: " + token);
+      fs.appendFileSync("./output/tokens.txt", `${token}\n`, (err) => {});
+      fs.appendFile(
+        "./output/accounts.txt",
+        `${email}:${password}\n`,
+        (err) => {
+          if (err) throw err;
+        }
+      );
+
+      fetch("https://discord.com/api/v9/users/@me/library", {
+        headers: {
+          Authorization: token,
+        },
+      }).then((response) => {
+        if (response.status == 200) {
+          fs.appendFileSync("./output/unlocked.txt", `${token}\n`, (err) => {});
+          console.log(`${token} - is Unlocked :)`);
+        } else {
+          fs.appendFileSync("./output/locked.txt", `${token} -\n`, (err) => {});
+          console.log(`${token} - is Locked :(`);
+        }
+      });
+
+      await wait(randomInt(2000, 3000));
+      var verify = true;
+      await page
+        .waitForSelector(
+          "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(4) > div > div.flex-2S1XBF.flex-3BkGQD.vertical-3aLnqW.flex-3BkGQD.directionColumn-3pi1nm.justifyStart-2Mwniq.alignCenter-14kD11.noWrap-hBpHBz.verification-2oQUwN > div.flex-2S1XBF.flex-3BkGQD.vertical-3aLnqW.flex-3BkGQD.directionColumn-3pi1nm.justifyCenter-rrurWZ.alignCenter-14kD11.noWrap-hBpHBz.container-1Yj1aL > div.flex-2S1XBF.flex-3BkGQD.vertical-3aLnqW.flex-3BkGQD.directionColumn-3pi1nm.justifyCenter-rrurWZ.alignStretch-Uwowzr.noWrap-hBpHBz > button > div"
+        )
+        .catch((err) => {
+          console.log("No phone verification dialog found");
+          verify = false;
+        });
+      if (!verify) return;
+      verify = await page.$eval(
+        "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(4) > div > div.flex-2S1XBF.flex-3BkGQD.vertical-3aLnqW.flex-3BkGQD.directionColumn-3pi1nm.justifyStart-2Mwniq.alignCenter-14kD11.noWrap-hBpHBz.verification-2oQUwN > div.flex-2S1XBF.flex-3BkGQD.vertical-3aLnqW.flex-3BkGQD.directionColumn-3pi1nm.justifyCenter-rrurWZ.alignCenter-14kD11.noWrap-hBpHBz.container-1Yj1aL > div.flex-2S1XBF.flex-3BkGQD.vertical-3aLnqW.flex-3BkGQD.directionColumn-3pi1nm.justifyCenter-rrurWZ.alignStretch-Uwowzr.noWrap-hBpHBz > button > div",
+        (el) => el.innerHTML,
+        { timeout: 5000 }
+      );
+
+      if (verify && verify.includes("Verify")) {
+        console.log("Phone Verification Required... Quitting");
+        process.exit(0);
+      }
+
+      await page.waitForSelector("#react-select-2-input", { timeout: 1000 });
+      await page.focus("#react-select-2-input");
+      await page.keyboard.type(month, { delay: randomInt(80, 120) });
+      await page.keyboard.press("Enter");
+
+      await page.waitForSelector("#react-select-3-input", { timeout: 1000 });
+      await page.focus("#react-select-3-input");
+      await page.keyboard.type(date, { delay: randomInt(80, 120) });
+      await page.keyboard.press("Enter");
+
+      await page.waitForSelector("#react-select-4-input", { timeout: 1000 });
+      await page.focus("#react-select-4-input");
+      await page.keyboard.type(year, { delay: randomInt(80, 120) });
+      await page.keyboard.press("Enter");
+
+      await page.waitForSelector(
+        "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(3) > div.layer-fP3xEz > div > div > div.content-rR1mSS.theme-light > div > div > div > div > form > div.footer-3VMrvt > div > button"
+      );
+
+      await page.click(
+        "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(3) > div.layer-fP3xEz > div > div > div.content-rR1mSS.theme-light > div > div > div > div > form > div.footer-3VMrvt > div > button"
+      );
+
+      await wait(randomInt(2000, 2500));
+
+      await page.waitForSelector(
+        "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(3) > div.layer-fP3xEz > div > div > div.content-rR1mSS.theme-light > button"
+      );
+
+      await page.click(
+        "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(3) > div.layer-fP3xEz > div > div > div.content-rR1mSS.theme-light > button"
+      );
+
+      await wait(randomInt(1500, 2000));
+
+      await page.waitForSelector(
+        "#:r1: > div.text-md-normal-2rFCH3.formBody-3nEn-J"
+      );
+
+      await page.waitForSelector(
+        "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(3) > div.layer-fP3xEz > div > div > div > div.content-1OG56Q.thin-RnSY0a.scrollerBase-1Pkza4 > form > div:nth-child(1) > div > input"
+      );
+
+      await page.focus(
+        "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(3) > div.layer-fP3xEz > div > div > div > div.content-1OG56Q.thin-RnSY0a.scrollerBase-1Pkza4 > form > div:nth-child(1) > div > input"
+      );
+      await page.keyboard.type(email, { delay: randomInt(80, 120) });
+
+      await page.waitForSelector(
+        "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(3) > div.layer-fP3xEz > div > div > div > div.content-1OG56Q.thin-RnSY0a.scrollerBase-1Pkza4 > form > div:nth-child(2) > div > input"
+      );
+
+      await page.focus(
+        "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(3) > div.layer-fP3xEz > div > div > div > div.content-1OG56Q.thin-RnSY0a.scrollerBase-1Pkza4 > form > div:nth-child(2) > div > input"
+      );
+      await page.keyboard.type(password, { delay: randomInt(80, 120) });
+
+      await wait(randomInt(500, 1000));
+
+      //hit enter
+      await page.keyboard.press("Enter");
+
+      //get innerhtml
+
+      // #react-select-2-input
+      // #react-select-3-input
+      // #react-select-4-input
+
+      // click button
+      // #app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(3) > div.layer-fP3xEz > div > div > div.content-rR1mSS.theme-light > div > div > div > div > form > div.footer-3VMrvt > div > button
+
+      //click close button
+      // #app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(3) > div.layer-fP3xEz > div > div > div.content-rR1mSS.theme-light > button
+
+      //#\:r1\: > div.text-md-normal-2rFCH3.formBody-3nEn-J
+
+      // Claim your account by entering an email and password.
+
+      // ==================
+      //#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(3) > div.layer-fP3xEz > div > div > div > div.content-1OG56Q.thin-RnSY0a.scrollerBase-1Pkza4 > form > div:nth-child(1) > div > input
+
+      //#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(3) > div.layer-fP3xEz > div > div > div > div.content-1OG56Q.thin-RnSY0a.scrollerBase-1Pkza4 > form > div:nth-child(2) > div > input
+
+      //close
+      //#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(3) > div.layer-fP3xEz > div > div > div > div.content-1OG56Q.successContent-2f_jZT.thin-RnSY0a.scrollerBase-1Pkza4 > button
+
+      // await page.waitForSelector(
+      //   "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(4) > div.layer-fP3xEz > div > div > div.container-MI32-l > div.marginBottom20-315RVT > div > input"
+      // );
+
+      // await page.focus(
+      //   "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(4) > div.layer-fP3xEz > div > div > div.container-MI32-l > div.marginBottom20-315RVT > div > input"
+      // );
+      // await page.keyboard.type(email, { delay: randomInt(60, 120) });
+
+      // await page.focus(
+      //   "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(4) > div.layer-fP3xEz > div > div > div.container-MI32-l > div.marginBottom40-fvAlAV > div > input"
+      // );
+
+      // await page.keyboard.type(password, { delay: randomInt(60, 120) });
+
+      // await page.click(
+      //   "#app-mount > div.appAsidePanelWrapper-ev4hlp > div.notAppAsidePanel-3yzkgB > div:nth-child(4) > div.layer-fP3xEz > div > div > div.container-MI32-l > button"
+      // );
+
+      console.log("Trying to verify email...");
       if (config.devMode) console.log("Fetching emails...");
       const fetchHeaders = await browser.newPage();
       await fetchHeaders.setRequestInterception(true);
       fetchHeaders.on("request", async (request) => {
-        // console.log(request.url());
         if (request.url() === "https://www.emailnator.com/message-list") {
           request.abort();
 
@@ -382,7 +517,7 @@ async function verifyEmail(data, index, email, page, headers) {
     await page.bringToFront();
     var selector =
       "#root > div > section > div > div > div.mb-3.col-lg-6.col-sm-12 > div > div > div.card > div > div > div:nth-child(10) > div:nth-child(3) > div > table > tbody > tr > td > div > table > tbody > tr:nth-child(2) > td > table > tbody > tr > td > a";
-    await page.waitForSelector(selector, { timeout: 15000 }).catch(() => {
+    await page.waitForSelector(selector, { timeout: 20000 }).catch(() => {
       selector =
         "#root > div > section > div > div > div.mb-3.col-lg-6.col-sm-12 > div > div > div.card > div > div > div:nth-child(13) > div:nth-child(4) > div > table > tbody > tr > td > div > table > tbody > tr:nth-child(2) > td > table > tbody > tr > td > a";
     });
@@ -464,12 +599,7 @@ async function verifyEmail(data, index, email, page, headers) {
       ]);
     });
 
-    fs.appendFileSync("./output/tokens.txt", `${token}\n`, (err) => {});
-    fs.appendFile("./output/accounts.txt", `${email}:${password}\n`, (err) => {
-      if (err) throw err;
-    });
-    console.log(token);
-
+    console.log("Rechecking if the token is locked or unlocked...");
     fetch("https://discord.com/api/v9/users/@me/library", {
       headers: {
         Authorization: token,
@@ -477,13 +607,11 @@ async function verifyEmail(data, index, email, page, headers) {
     }).then((response) => {
       if (response.status == 200) {
         fs.appendFileSync("./output/unlocked.txt", `${token}\n`, (err) => {});
-        console.log(`${token} - UNLOCKED`);
+        console.log(`${token} - is Unlocked :)`);
       } else {
-        fs.appendFileSync("./output/locked.txt", `${token} -\n`, (err) => {});
-        console.log(`${token} - LOCKED`);
+        console.log(`${token} - is Locked :(`);
       }
     });
-
     // await page.click(
     //   "#root > div > section > div > div > div.mb-3.col-lg-6.col-sm-12 > div > div > div.card > div > div > div:nth-child(13) > div:nth-child(4) > div > table > tbody > tr > td > div > table > tbody > tr:nth-child(2) > td > table > tbody > tr > td > a"
     // );
